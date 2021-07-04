@@ -33,7 +33,7 @@ class Remove_twins:
         if filename.rfind(".") == -1:
             return filename
 
-        return filename[: filename.rfind(".") - 1]
+        return filename[: filename.rfind(".")]
 
     def __files_to_remove(self):
         files_to_remove = []
