@@ -35,10 +35,14 @@ class Remove_twins:
             if (
                 str(file2)[0 : len(f"{file1}")] == f"{file1}"
                 and file1.stat().st_size == file2.stat().st_size
-                or str(file1)[0 : len(f"{file2}")] == f"{file2}"
-                and file1.stat().st_size == file2.stat().st_size
             ):
                 files_to_remove.append(file2)
+            if (
+                str(file1)[0 : len(f"{file2}")] == f"{file2}"
+                and file1.stat().st_size == file2.stat().st_size
+            ):
+                files_to_remove.append(file1)
+
         return files_to_remove
 
     def dry(self):
