@@ -4,9 +4,15 @@ import argparse
 
 # Create a class Remove_twins
 class Remove_twins:
-    def __init__(self):
+    ''' Removing twin files.
+    nosize: Boolean if true, ignore filesizes
+    '''
+    def __init__(self, nosize = False):
         self.filenames = []  # filenames list
         self.path = Path(".")  # define default path for futur functionnalities...
+        self.nosize = nosize
+        if self.nosize:
+            print("nosize")
         self.__list_files()
 
     def __list_files(self):
@@ -15,6 +21,18 @@ class Remove_twins:
         for filename in self.filenames:
             if not filename.is_file():
                 self.filenames.remove(filename)
+
+    def __remove_ext(self, filename):
+        """Return the filename with no extention
+
+        Keyword arguments:
+        filename -- the original filename
+        """
+        # Check if a .something exist in the actual filename
+        if filename.rfind(".") == -1:
+            return filename
+
+        return filename[:filename.rfind(".")-1]
 
     def __files_to_remove(self):
         files_to_remove = []
@@ -31,15 +49,19 @@ class Remove_twins:
         for i in range(len(self.filenames) - 1):
             file1 = self.filenames[i]
             file2 = self.filenames[i + 1]
+            file1_noext = self.__remove_ext(str(file1))
+            file2_noext = self.__remove_ext(str(file2))
             # Test if the filenames are similar
             if (
-                str(file2)[0 : len(f"{file1}")] == f"{file1}"
-                and file1.stat().st_size == file2.stat().st_size
+                file2_noext[0 : len(file1_noext)] == file1_noext
+                and (file1.stat().st_size == file2.stat().st_size
+                or self.nosize)
             ):
                 files_to_remove.append(file2)
             if (
-                str(file1)[0 : len(f"{file2}")] == f"{file2}"
-                and file1.stat().st_size == file2.stat().st_size
+                file1_noext[0 : len(file2_noext)] == file2_noext
+                and (file1.stat().st_size == file2.stat().st_size
+                or self.nosize)
             ):
                 files_to_remove.append(file1)
 
@@ -62,10 +84,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dry", help="dry test, not deleting anything", action="store_true"
     )
+    parser.add_argument(
+        "--nosize", help="ignoring filesizes", action="store_true"
+    )
     args = parser.parse_args()
 
     # Instance the main Class
-    hereIam = Remove_twins()
+    hereIam = Remove_twins(nosize = args.nosize)
 
     if args.dry:
         print("Running dry test.")
